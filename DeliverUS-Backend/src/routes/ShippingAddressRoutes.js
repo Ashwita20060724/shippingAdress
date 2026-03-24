@@ -8,7 +8,34 @@ import { checkShippingAddressOwnership } from '../middlewares/ShippingAddressMid
 
 const loadShippingAddressRoutes = function (app) {
   // TODO: Implement the routes for shipping addresses
-
+  app.route('/shippingaddresses')
+  .get(
+    isLoggedIn,
+    ShippingAddressController.index
+  )
+  .post(
+    isLoggedIn,
+    hasRole('customer'),
+    ShippingAddressValidation.create,
+    handleValidation,
+    ShippingAddressController.create
+  )
+  app.route('/shippingaddresses/:shippingAddressId/default')
+  .patch(
+    isLoggedIn,
+    hasRole('customer'),
+    checkEntityExists(ShippingAddress, 'shippingAddressId'),
+    checkShippingAddressOwnership,
+    ShippingAddressController.markDefault
+  )
+  app.route('/shippingaddresses/:shippingAddressId')
+  .delete(
+    isLoggedIn,
+    hasRole('customer'),
+    checkEntityExists(ShippingAddress, 'shippingAddressId'),
+    checkShippingAddressOwnership,
+    ShippingAddressController.destroy
+  )
 }
 
 export default loadShippingAddressRoutes
